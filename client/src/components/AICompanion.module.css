@@ -3,7 +3,7 @@
   width: 52px; height: 52px; border-radius: 50%;
   background: var(--bg2); border: 1px solid var(--accent);
   color: var(--accent); font-size: 20px; cursor: pointer;
-  box-shadow: 0 0 20px rgba(139,92,246,0.3);
+  box-shadow: 0 0 20px rgba(248, 239, 223, 0.95);
   transition: all 0.2s; display: flex; align-items: center; justify-content: center;
   z-index: 50; position: fixed;
 }

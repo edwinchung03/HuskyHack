@@ -19,7 +19,7 @@ router.get('/:date', (req, res) => {
 
 router.post('/', (req, res) => {
   const db = getDb();
-  const { date, title, body, audio_path, image_path, mood_label, mood_color, mood_shape, ai_summary, ai_reflection, image_prompt } = req.body;
+  const { date, title, body, audio_path, image_path, mood_label, mood_color, mood_shape, ai_summary, ai_reflection, image_prompt, override } = req.body;
 
   try {
     const result = db.prepare(`
@@ -33,6 +33,13 @@ router.post('/', (req, res) => {
     res.status(201).json(entry);
   } catch (err) {
     if (err.message.includes('UNIQUE constraint failed')) {
+      const existing = db.prepare('SELECT * FROM entries WHERE date = ?').get(date);
+      if (!override) {
+        return res.status(409).json({
+          error: 'You already have a diary for that day.',
+          existingEntry: existing,
+        });
+      }
       db.prepare(`
         UPDATE entries SET title=?, body=?, audio_path=?, image_path=?, mood_label=?, mood_color=?,
         mood_shape=?, ai_summary=?, ai_reflection=?, image_prompt=?, updated_at=CURRENT_TIMESTAMP

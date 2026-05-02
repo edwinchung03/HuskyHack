@@ -1,31 +1,12 @@
 export const MOOD_CONFIG = {
-  happy:      { color: '#FFD700', label: 'Happy' },
-  excited:    { color: '#FF6B35', label: 'Excited' },
-  calm:       { color: '#4ECDC4', label: 'Calm' },
-  sad:        { color: '#5B8DB8', label: 'Sad' },
-  anxious:    { color: '#9B59B6', label: 'Anxious' },
-  angry:      { color: '#E74C3C', label: 'Angry' },
-  reflective: { color: '#A0A8C0', label: 'Reflective' },
-  neutral:    { color: '#6C757D', label: 'Neutral' },
-  grateful:   { color: '#2ECC71', label: 'Grateful' },
-  nostalgic:  { color: '#E8A838', label: 'Nostalgic' },
+  positive:  { color: '#fca311', label: 'Positive' },
+  negative:  { color: '#540b0e', label: 'Negative' },
+  neutral:   { color: '#e3d5ca', label: 'Neutral' },
+  disturbed: { color: '#335c67', label: 'Disturbed' },
+  easy:      { color: '#a2d2ff', label: 'Easy' },
 };
 
-function Star({ color, size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24">
-      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
-        fill={color} />
-    </svg>
-  );
-}
-function Lightning({ color, size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24">
-      <polygon points="13,2 3,14 12,14 11,22 21,10 12,10" fill={color} />
-    </svg>
-  );
-}
+// neutral
 function Circle({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -33,6 +14,8 @@ function Circle({ color, size }) {
     </svg>
   );
 }
+
+// negative
 function Teardrop({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -40,6 +23,8 @@ function Teardrop({ color, size }) {
     </svg>
   );
 }
+
+// disturbed
 function Spiral({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -48,13 +33,7 @@ function Spiral({ color, size }) {
     </svg>
   );
 }
-function Flame({ color, size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24">
-      <path d="M12 2c0 0-6 7-6 12a6 6 0 0 0 12 0c0-2-1.5-4-2-5 0 0 0 3-2 4 0 0-1-4 0-7 0 0-1 2-1 3C12 7 11 4 12 2Z" fill={color} />
-    </svg>
-  );
-}
+// easy
 function Moon({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -62,13 +41,8 @@ function Moon({ color, size }) {
     </svg>
   );
 }
-function Diamond({ color, size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24">
-      <polygon points="12,2 22,12 12,22 2,12" fill={color} />
-    </svg>
-  );
-}
+
+// positive
 function Heart({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -76,38 +50,28 @@ function Heart({ color, size }) {
     </svg>
   );
 }
-function Leaf({ color, size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24">
-      <path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 0 0 8 20C19 20 22 3 22 3c-1 2-8 3-11 6" fill={color} />
-    </svg>
-  );
-}
 
 const SHAPE_COMPONENTS = {
-  star: Star, lightning: Lightning, circle: Circle,
-  teardrop: Teardrop, spiral: Spiral, flame: Flame,
-  moon: Moon, diamond: Diamond, heart: Heart, leaf: Leaf,
+  positive: Heart,
+  negative: Teardrop,
+  neutral: Circle,
+  disturbed: Spiral,
+  easy: Moon,
 };
 
+export function normalizeMood(mood = 'neutral') {
+  const key = String(mood).toLowerCase();
+  return MOOD_CONFIG[key] ? key : 'neutral';
+}
+
 export default function MoodShape({ mood = 'neutral', size = 22, glow = false }) {
-  const cfg = MOOD_CONFIG[mood] || MOOD_CONFIG.neutral;
-  const ShapeComp = SHAPE_COMPONENTS[
-    mood === 'happy' ? 'star' :
-    mood === 'excited' ? 'lightning' :
-    mood === 'calm' ? 'circle' :
-    mood === 'sad' ? 'teardrop' :
-    mood === 'anxious' ? 'spiral' :
-    mood === 'angry' ? 'flame' :
-    mood === 'reflective' ? 'moon' :
-    mood === 'grateful' ? 'heart' :
-    mood === 'nostalgic' ? 'leaf' :
-    'diamond'
-  ] || Diamond;
+  const normalizedMood = normalizeMood(mood);
+  const cfg = MOOD_CONFIG[normalizedMood] || MOOD_CONFIG.neutral;
+  const ShapeComp = SHAPE_COMPONENTS[normalizedMood] || Circle;
 
   return (
     <span
-      title={cfg.label}
+      title={`Mood: ${cfg.label}`}
       style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         filter: glow ? `drop-shadow(0 0 6px ${cfg.color}99)` : undefined,

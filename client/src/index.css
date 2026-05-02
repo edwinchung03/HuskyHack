@@ -1,19 +1,19 @@
 :root {
-  --bg:          #06070f;
-  --bg2:         #0d0e1c;
-  --glass:       rgba(255, 255, 255, 0.04);
-  --glass-hover: rgba(255, 255, 255, 0.07);
-  --border:      rgba(255, 255, 255, 0.08);
-  --border-glow: rgba(139, 92, 246, 0.4);
-  --accent:      #8b5cf6;
-  --accent-dim:  rgba(139, 92, 246, 0.15);
-  --text:        #ededf5;
-  --text-dim:    #7e7d99;
-  --text-muted:  #4a4966;
+  --bg:          #fbf6ef;
+  --bg2:         #fdf8f1;
+  --glass:       rgba(255, 249, 240, 0.72);
+  --glass-hover: rgba(255, 248, 237, 0.9);
+  --border:      rgba(133, 101, 73, 0.18);
+  --border-glow: rgba(180, 120, 74, 0.28);
+  --accent:      #b7794b;
+  --accent-dim:  rgba(183, 121, 75, 0.16);
+  --text:        #3f2f21;
+  --text-dim:    #745c47;
+  --text-muted:  #96795e;
   --radius:      14px;
   --radius-lg:   22px;
-  --shadow:      0 4px 24px rgba(0,0,0,0.5);
-  --shadow-lg:   0 12px 48px rgba(0,0,0,0.7);
+  --shadow:      0 10px 30px rgba(111, 82, 54, 0.12);
+  --shadow-lg:   0 18px 54px rgba(111, 82, 54, 0.18);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,7 +25,8 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   background-image:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(139,92,246,0.12) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(244, 223, 196, 0.72) 0%, transparent 70%),
+    linear-gradient(180deg, #fffaf3 0%, #f6eee2 100%);
 }
 
 ::-webkit-scrollbar { width: 5px; }
@@ -41,6 +42,66 @@ body {
 
 .fade-up { animation: fadeUp 0.35s ease forwards; }
 
+/* ---------- Nav ---------- */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(196, 168, 138, 0.96);
+  box-shadow: 0 10px 26px rgba(111, 82, 54, 0.16);
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff7ec;
+}
+
+.nav-logo-icon {
+  color: #fff7ec;
+  font-size: 18px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-link,
+.nav-link.active {
+  padding: 7px 16px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+
+.nav-link {
+  color: rgba(255, 247, 236, 0.8);
+}
+
+.nav-link:hover {
+  color: #fffdf9;
+  background: rgba(255, 247, 236, 0.14);
+}
+
+.nav-link.active {
+  color: #fffdf9;
+  background: rgba(255, 247, 236, 0.18);
+  border: 1px solid rgba(255, 247, 236, 0.28);
+}
+
 /* ---------- Buttons ---------- */
 .btn {
   display: inline-flex; align-items: center; gap: 7px;
@@ -49,9 +110,9 @@ body {
   cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
 }
 .btn-primary  { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: #9d71fa; box-shadow: 0 0 20px rgba(139,92,246,0.4); transform: translateY(-1px); }
+.btn-primary:hover { background: #9f673f; box-shadow: 0 0 20px rgba(248, 239, 223, 0.9); transform: translateY(-1px); }
 .btn-secondary { background: var(--glass); color: var(--text); border: 1px solid var(--border); }
-.btn-secondary:hover { background: var(--glass-hover); border-color: rgba(139,92,246,0.3); }
+.btn-secondary:hover { background: var(--glass-hover); border-color: rgba(183,121,75,0.3); }
 .btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid transparent; }
 .btn-ghost:hover { background: var(--glass); color: var(--text); }
 .btn-danger { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
@@ -94,7 +155,7 @@ input::placeholder, textarea::placeholder { color: var(--text-muted); }
 
 /* ---------- Modal overlay ---------- */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  position: fixed; inset: 0; background: rgba(90,67,46,0.24);
   backdrop-filter: blur(6px); display: flex; align-items: center;
   justify-content: center; z-index: 100; padding: 20px;
   animation: fadeUp 0.2s ease;

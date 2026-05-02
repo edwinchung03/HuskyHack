@@ -2,175 +2,73 @@ import { useRef, useState, useEffect } from 'react';
 import { uploadImage } from '../api';
 import styles from './ImagePanel.module.css';
 
-const COMIC_CONFIG = {
-  happy:      { bg: '#FFE500', dot: '#FF9E00', accent: '#FF3D00', text: 'YAY!',    shape: 'star'      },
-  excited:    { bg: '#FF4500', dot: '#FF8C00', accent: '#FFFF00', text: 'POW!',    shape: 'lightning' },
-  calm:       { bg: '#00C9C8', dot: '#007F7F', accent: '#FFFFFF', text: 'ahhh...', shape: 'circle'    },
-  sad:        { bg: '#4A90D9', dot: '#1A3A6B', accent: '#FFFFFF', text: '*sigh*',  shape: 'teardrop'  },
-  anxious:    { bg: '#9B3FB5', dot: '#5C1A7A', accent: '#FFE500', text: '!!!',     shape: 'spiral'    },
-  angry:      { bg: '#E8000D', dot: '#7A0008', accent: '#FFE500', text: 'ARGH!',   shape: 'flame'     },
-  reflective: { bg: '#7B8FA8', dot: '#3A4D66', accent: '#FFFFFF', text: 'hmm...',  shape: 'moon'      },
-  grateful:   { bg: '#00C853', dot: '#005C20', accent: '#FFFFFF', text: '♥',       shape: 'heart'     },
-  nostalgic:  { bg: '#E8A000', dot: '#7A5000', accent: '#FFFFFF', text: '...',     shape: 'leaf'      },
-  neutral:    { bg: '#8E9BB0', dot: '#3A4A60', accent: '#FFFFFF', text: 'meh.',    shape: 'diamond'   },
-};
+// Generates procedural mood-based art on a canvas (always works, no API needed)
+function drawMoodArt(canvas, mood, seed = Date.now()) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const rng = (() => { let s = seed; return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 4294967296; }; })();
 
-function drawComicPanel(canvas, mood) {
-  const cfg = COMIC_CONFIG[mood] || COMIC_CONFIG.neutral;
-  const ctx  = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
+  const palettes = {
+    happy:      ['#FFD700','#FF9E00','#FFF176','#FFAB40','#FFE082'],
+    excited:    ['#FF6B35','#FF4081','#FF6E40','#FF3D00','#FF6D00'],
+    calm:       ['#4ECDC4','#26A69A','#80CBC4','#00BCD4','#B2EBF2'],
+    sad:        ['#5B8DB8','#3A7BD5','#5C6BC0','#7986CB','#90A4AE'],
+    anxious:    ['#9B59B6','#8E44AD','#CE93D8','#AB47BC','#7B1FA2'],
+    angry:      ['#E74C3C','#C0392B','#FF5252','#FF1744','#B71C1C'],
+    reflective: ['#A0A8C0','#78909C','#B0BEC5','#90A4AE','#607D8B'],
+    grateful:   ['#2ECC71','#27AE60','#A5D6A7','#66BB6A','#43A047'],
+    nostalgic:  ['#E8A838','#F9A825','#FFD54F','#FFB300','#FF8F00'],
+    neutral:    ['#6C757D','#868E96','#ADB5BD','#495057','#343A40'],
+  };
+  const colors = palettes[mood] || palettes.neutral;
+  const bg = colors[0] + '22';
 
-  // --- Background ---
-  ctx.fillStyle = cfg.bg;
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#0d0e1c';
+  ctx.fillRect(0, 0, w, h);
 
-  // --- Halftone dot overlay ---
-  const dotR   = 5;
-  const dotGap = 18;
-  ctx.fillStyle = cfg.dot + '55';
-  for (let y = 0; y < H; y += dotGap) {
-    for (let x = (Math.floor(y / dotGap) % 2 === 0 ? 0 : dotGap / 2); x < W; x += dotGap) {
+  for (let i = 0; i < 6; i++) {
+    const x = rng() * w, y = rng() * h, r = 60 + rng() * 140;
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
+    grad.addColorStop(0, colors[i % colors.length] + '55');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+
+  // Mood-specific patterns
+  if (mood === 'calm' || mood === 'reflective') {
+    ctx.strokeStyle = colors[0] + '44';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) {
+      const y = h * (i / 8) + rng() * 20;
       ctx.beginPath();
-      ctx.arc(x, y, dotR, 0, Math.PI * 2);
+      for (let x = 0; x <= w; x += 4) {
+        ctx.lineTo(x, y + Math.sin(x / 40 + i) * 20);
+      }
+      ctx.stroke();
+    }
+  } else if (mood === 'happy' || mood === 'grateful') {
+    for (let i = 0; i < 30; i++) {
+      const x = rng() * w, y = rng() * h, r = 2 + rng() * 5;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = colors[i % colors.length] + 'cc';
       ctx.fill();
     }
-  }
-
-  const cx = W / 2, cy = H / 2 - 20;
-
-  // --- Speed lines (radiating from center) for energetic moods ---
-  if (['excited', 'angry', 'happy', 'anxious'].includes(mood)) {
-    ctx.save();
-    ctx.strokeStyle = cfg.dot + '99';
-    ctx.lineWidth = 2;
-    for (let a = 0; a < Math.PI * 2; a += Math.PI / 14) {
-      const x1 = cx + Math.cos(a) * 35;
-      const y1 = cy + Math.sin(a) * 35;
-      const x2 = cx + Math.cos(a) * (W * 0.8);
-      const y2 = cy + Math.sin(a) * (H * 0.8);
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  // --- Main mood shape (large, bold outline) ---
-  ctx.fillStyle = cfg.accent;
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = 4;
-  const s = 60;
-
-  if (mood === 'happy' || mood === 'excited') {
-    // 5-pointed star
-    ctx.beginPath();
-    for (let i = 0; i < 5; i++) {
-      const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-      const b = ((i * 4 + 2) * Math.PI) / 5 - Math.PI / 2;
-      i === 0 ? ctx.moveTo(cx + s * Math.cos(a), cy + s * Math.sin(a)) : ctx.lineTo(cx + s * Math.cos(a), cy + s * Math.sin(a));
-      ctx.lineTo(cx + (s / 2.2) * Math.cos(b), cy + (s / 2.2) * Math.sin(b));
-    }
-    ctx.closePath(); ctx.fill(); ctx.stroke();
-  } else if (mood === 'calm' || mood === 'grateful') {
-    ctx.beginPath(); ctx.arc(cx, cy, s * 0.75, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
-  } else if (mood === 'sad') {
-    ctx.beginPath();
-    ctx.arc(cx, cy - s * 0.3, s * 0.6, 0, Math.PI * 2);
-    ctx.moveTo(cx, cy - s * 0.3 + s * 0.6);
-    ctx.quadraticCurveTo(cx + 10, cy + s * 0.7, cx, cy + s);
-    ctx.quadraticCurveTo(cx - 10, cy + s * 0.7, cx, cy - s * 0.3 + s * 0.6);
-    ctx.fill(); ctx.stroke();
-  } else if (mood === 'angry') {
-    // Flame shape
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - s);
-    ctx.bezierCurveTo(cx + s * 0.6, cy - s * 0.5, cx + s * 0.5, cy + s * 0.5, cx, cy + s * 0.8);
-    ctx.bezierCurveTo(cx - s * 0.5, cy + s * 0.5, cx - s * 0.6, cy - s * 0.5, cx, cy - s);
-    ctx.fill(); ctx.stroke();
   } else if (mood === 'anxious') {
-    // Spiral
-    ctx.beginPath();
-    for (let a = 0; a < Math.PI * 5; a += 0.1) {
-      const r = (a / (Math.PI * 5)) * s;
-      const px = cx + r * Math.cos(a);
-      const py = cy + r * Math.sin(a);
-      a < 0.1 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    ctx.strokeStyle = colors[2] + '66';
+    ctx.lineWidth = 1.5;
+    const cx = w / 2, cy = h / 2;
+    for (let r = 10; r < 120; r += 12) {
+      ctx.beginPath();
+      for (let a = 0; a < Math.PI * 2; a += 0.05) {
+        const wobble = r + Math.sin(a * 5 + rng() * 2) * 6;
+        const px = cx + Math.cos(a) * wobble;
+        const py = cy + Math.sin(a) * wobble;
+        a === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.stroke();
     }
-    ctx.lineWidth = 5; ctx.strokeStyle = cfg.accent; ctx.stroke();
-    ctx.lineWidth = 4; ctx.strokeStyle = '#000'; ctx.stroke();
-  } else if (mood === 'reflective' || mood === 'nostalgic') {
-    // Crescent moon
-    ctx.beginPath(); ctx.arc(cx, cy, s * 0.75, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = cfg.bg;
-    ctx.beginPath(); ctx.arc(cx + s * 0.3, cy - s * 0.1, s * 0.6, 0, Math.PI * 2);
-    ctx.fill();
-  } else {
-    // Diamond fallback
-    ctx.beginPath();
-    ctx.moveTo(cx, cy - s); ctx.lineTo(cx + s * 0.7, cy);
-    ctx.lineTo(cx, cy + s); ctx.lineTo(cx - s * 0.7, cy);
-    ctx.closePath(); ctx.fill(); ctx.stroke();
   }
-
-  // --- Speech / explosion bubble with text ---
-  const bx = W * 0.62, by = H * 0.14;
-  const bw = 110, bh = 46, br = 12;
-
-  // Jagged explosion shape for energetic moods
-  if (['excited', 'angry', 'happy'].includes(mood)) {
-    ctx.fillStyle = '#FFE500';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    const pts = 14;
-    for (let i = 0; i < pts * 2; i++) {
-      const a = (i / (pts * 2)) * Math.PI * 2;
-      const r = i % 2 === 0 ? bh : bh * 0.62;
-      const px = bx + r * Math.cos(a);
-      const py = by + r * Math.sin(a);
-      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
-    }
-    ctx.closePath(); ctx.fill(); ctx.stroke();
-  } else {
-    // Regular rounded bubble
-    ctx.fillStyle = '#fff';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.roundRect(bx - bw / 2, by - bh / 2, bw, bh, br);
-    ctx.fill(); ctx.stroke();
-    // Bubble tail
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.moveTo(bx - 10, by + bh / 2);
-    ctx.lineTo(cx + s * 0.4, cy - s * 0.6);
-    ctx.lineTo(bx + 10, by + bh / 2);
-    ctx.fill();
-    ctx.strokeStyle = '#000'; ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(bx - 10, by + bh / 2);
-    ctx.lineTo(cx + s * 0.4, cy - s * 0.6);
-    ctx.moveTo(bx + 10, by + bh / 2);
-    ctx.lineTo(cx + s * 0.4, cy - s * 0.6);
-    ctx.stroke();
-  }
-
-  // Bubble text
-  ctx.fillStyle = '#000';
-  ctx.font = `bold ${cfg.text.length > 4 ? 14 : 18}px 'Impact', 'Arial Black', sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(cfg.text, bx, by);
-
-  // --- Panel border ---
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(3, 3, W - 6, H - 6);
-
-  // --- Inner shadow lines (top-left corner detail) ---
-  ctx.strokeStyle = '#00000033';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(9, 9, W - 18, H - 18);
 }
 
 export default function ImagePanel({ mood, imagePrompt, onImageSaved, savedImagePath }) {
