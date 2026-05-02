@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns';
 import AudioRecorder from '../components/AudioRecorder';
 import ImagePanel from '../components/ImagePanel';
 import MoodShape, { MOOD_CONFIG, normalizeMood } from '../components/MoodShape';
-import { getEntry, saveEntry, updateEntry, analyzeEntry } from '../api';
+import { getEntry, saveEntry, updateEntry, deleteEntry, analyzeEntry } from '../api';
 import styles from './Editor.module.css';
 
 function escapeHtml(text = '') {
@@ -50,10 +50,12 @@ export default function Editor() {
   const [analysis, setAnalysis]   = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [saving, setSaving]       = useState(false);
+  const [deleting, setDeleting]   = useState(false);
   const [saved, setSaved]         = useState(false);
   const [entryId, setEntryId]     = useState(null);
   const [error, setError]         = useState('');
   const [showOverridePrompt, setShowOverridePrompt] = useState(false);
+  const [showDeletePrompt, setShowDeletePrompt] = useState(false);
 
   const dateLabel = format(parseISO(date), 'EEEE, MMMM d, yyyy');
 
@@ -61,6 +63,7 @@ export default function Editor() {
     setSaved(false);
     setError('');
     setShowOverridePrompt(false);
+    setShowDeletePrompt(false);
 
     if (isNewMode) {
       setTitle('');
@@ -144,7 +147,7 @@ export default function Editor() {
       setBody(editorHtml);
       setEntryId(entry.id);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      navigate('/');
     } catch (err) {
       if (err.status === 409) {
         setShowOverridePrompt(true);
@@ -176,12 +179,25 @@ export default function Editor() {
       setEntryId(entry.id);
       setShowOverridePrompt(false);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
-      navigate(`/editor/${date}`);
+      navigate('/');
     } catch (err) {
       setError('Save failed: ' + err.message);
     }
     setSaving(false);
+  }
+
+  async function handleDelete() {
+    if (!entryId) return;
+    setError('');
+    setDeleting(true);
+    try {
+      await deleteEntry(entryId);
+      setShowDeletePrompt(false);
+      navigate('/');
+    } catch (err) {
+      setError('Delete failed: ' + err.message);
+      setDeleting(false);
+    }
   }
 
   function handleUseTranscript(text) {
@@ -218,7 +234,7 @@ export default function Editor() {
         <button
           className={`btn ${saved ? 'btn-secondary' : 'btn-primary'}`}
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || deleting}
         >
           {saving ? <><span className="spinner" /> Saving…</> : saved ? '✓ Saved' : 'Save'}
         </button>
@@ -264,17 +280,17 @@ export default function Editor() {
             </div>
           </div>
 
-          {/* Analyze button */}
-          <button
-            className="btn btn-secondary"
-            onClick={handleAnalyze}
-            disabled={analyzing || !getPlainTextFromHtml(body)}
-            style={{ marginTop: 8 }}
-          >
-            {analyzing ? <><span className="spinner" /> Analyzing…</> : '✦ AI Analyze'}
-          </button>
-
           {error && <p className={styles.error}>{error}</p>}
+
+          {entryId && (
+            <button
+              className="btn btn-danger"
+              onClick={() => setShowDeletePrompt(true)}
+              disabled={saving || deleting}
+            >
+              Delete Diary
+            </button>
+          )}
         </div>
 
         {/* Right panel */}
@@ -285,6 +301,16 @@ export default function Editor() {
             onImageSaved={setImagePath}
             savedImagePath={imagePath}
           />
+
+          <button
+            className={`btn btn-secondary ${styles.aiAction}`}
+            onClick={handleAnalyze}
+            disabled={analyzing || !getPlainTextFromHtml(body)}
+          >
+            {analyzing
+              ? <><span className="spinner" /> Analyzing…</>
+              : 'Get the mood and reflection with our AI assistant'}
+          </button>
 
           {/* AI Reflection */}
           {analysis && (
@@ -302,7 +328,7 @@ export default function Editor() {
           {!analysis && (
             <div className={styles.emptyAnalysis}>
               <p style={{ fontSize: 32 }}>✦</p>
-              <p>Write your entry and click <strong>AI Analyze</strong> to get a mood reading, summary, and personal reflection.</p>
+              <p>Write your entry, then use the AI assistant to get your mood reading and reflection.</p>
             </div>
           )}
         </div>
@@ -320,6 +346,25 @@ export default function Editor() {
             <div className={styles.modalActions}>
               <button className="btn btn-primary" onClick={handleOverrideSave} disabled={saving}>Yes, override it</button>
               <button className="btn btn-secondary" onClick={() => navigate(`/editor/${date}`)}>No, let me edit it</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeletePrompt && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowDeletePrompt(false)}>
+          <div className={`modal ${styles.overrideModal} fade-up`}>
+            <button className={styles.closeBtn} onClick={() => setShowDeletePrompt(false)} aria-label="Close">
+              ×
+            </button>
+            <p className="section-label">Delete Diary</p>
+            <h2 className={styles.modalTitle}>Do you truly want to delete this diary?</h2>
+            <p className={styles.modalCopy}>This will permanently remove the diary for {dateLabel}. This action cannot be undone.</p>
+            <div className={styles.modalActions}>
+              <button className="btn btn-ghost" onClick={() => setShowDeletePrompt(false)} disabled={deleting}>Cancel</button>
+              <button className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
+                {deleting ? <><span className="spinner" /> Deleting…</> : 'Yes, delete it'}
+              </button>
             </div>
           </div>
         </div>

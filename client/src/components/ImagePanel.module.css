@@ -4,13 +4,36 @@
   border-radius: var(--radius);
   padding: 16px;
 }
-.placeholder { text-align: center; }
-.canvas {
-  width: 100%; border-radius: 10px;
-  background: #0d0e1c;
-  display: block;
+.placeholder {
+  text-align: center;
+  padding: 28px 18px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  background: rgba(255, 248, 237, 0.55);
 }
+.emptyTitle { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
 .hint { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; font-style: italic; }
-.previewWrap { text-align: center; }
-.preview { width: 100%; border-radius: 10px; max-height: 220px; object-fit: cover; display: block; }
-.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.previewWrap {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview {
+  display: block;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  max-height: min(60vh, 520px);
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}

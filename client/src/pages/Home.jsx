@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import Nav from '../components/Nav';
 import Calendar from '../components/Calendar';
-import AICompanion from '../components/AICompanion';
 import { getEntries } from '../api';
 import styles from './Home.module.css';
 
@@ -75,8 +74,6 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      <AICompanion />
     </div>
   );
 }

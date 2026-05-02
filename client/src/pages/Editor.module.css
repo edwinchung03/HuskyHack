@@ -91,6 +91,23 @@
 }
 
 .analysisCard { display: flex; flex-direction: column; gap: 12px; }
+.aiAction {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.45;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(111, 82, 54, 0.16), 0 0 0 1px rgba(255, 248, 237, 0.45) inset;
+}
+
+.aiAction:hover:not(:disabled) {
+  box-shadow: 0 14px 30px rgba(111, 82, 54, 0.22), 0 0 0 1px rgba(255, 248, 237, 0.6) inset;
+}
+
 .summary { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; }
 .reflection {
   font-size: 13.5px; color: var(--text-dim); line-height: 1.65;

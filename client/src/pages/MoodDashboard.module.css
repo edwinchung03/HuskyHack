@@ -19,33 +19,6 @@
   color: var(--text);
 }
 
-/* Stats */
-.statsRow { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-.statCard {
-  background: var(--glass); border: 1px solid var(--border);
-  border-radius: 12px; padding: 14px 20px; min-width: 80px;
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-}
-.statNum { font-size: 22px; font-weight: 700; line-height: 1; }
-.statLabel { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-
-/* Chart card */
-.chartCard {
-  background: var(--glass); border: 1px solid var(--border);
-  border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
-}
-.chart { width: 100%; display: block; }
-
-/* Legend */
-.legend {
-  display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px;
-  padding-top: 14px; border-top: 1px solid var(--border);
-}
-.legendItem { display: flex; align-items: center; gap: 6px; }
-.legendDot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legendLabel { font-size: 12px; color: var(--text-dim); }
-.legendCount { font-size: 11px; color: var(--text-muted); }
-
 /* Daily row */
 .dayRow {
   display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px;
@@ -78,7 +51,7 @@
 
 .reportBlock { display: flex; flex-direction: column; gap: 12px; }
 .reportText {
-  background: rgba(0,0,0,0.25); border: 1px solid var(--border);
+  background: rgb(253,252,220); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 16px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 12.5px; line-height: 1.75;

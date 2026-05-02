@@ -10,9 +10,6 @@ export default function Nav() {
         <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           📅 Diary
         </NavLink>
-        <NavLink to="/decisions" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-          🎯 Decisions
-        </NavLink>
         <NavLink to="/mood" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           📊 Mood Week
         </NavLink>
