@@ -1,0 +1,63 @@
+.page { min-height: 100vh; }
+.inner { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+.pageHeader {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 28px; gap: 16px;
+}
+.title {
+  font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700;
+  background: linear-gradient(135deg, #ededf5 30%, #8b5cf6 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+/* Stats */
+.statsRow { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.statCard {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 80px;
+}
+.statNum { font-size: 24px; font-weight: 700; line-height: 1; }
+.statLabel { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Filters */
+.filters { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+
+/* Grid */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+
+/* Card */
+.card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  cursor: pointer; transition: all 0.18s; display: flex; flex-direction: column; gap: 10px;
+}
+.card:hover { border-color: rgba(139,92,246,0.3); background: var(--glass-hover); transform: translateY(-2px); }
+.reviewCard { border-color: rgba(232,168,56,0.3); }
+.reviewCard:hover { border-color: rgba(232,168,56,0.5); }
+
+.cardTop { display: flex; align-items: center; justify-content: space-between; }
+.statusBadge {
+  font-size: 11.5px; font-weight: 600; padding: 3px 9px;
+  border-radius: 20px; border: 1px solid;
+}
+.confidence { font-size: 12px; color: var(--text-muted); letter-spacing: 2px; }
+[data-level="high"]   .confidence, .confidence[data-level="high"]   { color: #2ECC71; }
+[data-level="medium"] .confidence, .confidence[data-level="medium"] { color: #E8A838; }
+[data-level="low"]    .confidence, .confidence[data-level="low"]    { color: #E74C3C; }
+
+.cardTitle { font-size: 15px; font-weight: 600; line-height: 1.4; }
+.cardBet { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+.blindSpotHint { font-size: 11.5px; color: #E8A838; }
+
+.cardFooter { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.dueDate { font-size: 11.5px; }
+
+.loader { display: flex; justify-content: center; padding: 60px; }
+.empty {
+  text-align: center; padding: 60px 20px; color: var(--text-muted);
+  font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px;
+}

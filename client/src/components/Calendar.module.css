@@ -1,0 +1,132 @@
+.wrapper {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 0 4px;
+}
+
+.monthTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ededf5 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.dayLabel {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 6px 0;
+}
+
+.cell {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.dayCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dayCell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  opacity: 0;
+  transition: opacity 0.18s;
+  background: radial-gradient(circle at center, var(--mood-color, var(--accent)) 0%, transparent 70%);
+}
+
+.dayCell:hover { transform: translateY(-2px); border-color: rgba(139,92,246,0.3); }
+.dayCell:hover::before { opacity: 0.12; }
+
+.today {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(139,92,246,0.2);
+}
+
+.hasEntry {
+  border-color: color-mix(in srgb, var(--mood-color, var(--accent)) 40%, var(--border));
+}
+.hasEntry::before { opacity: 0.08; }
+
+.dayNum {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  line-height: 1;
+}
+
+.today .dayNum { color: var(--text); font-weight: 700; }
+.hasEntry .dayNum { color: var(--text); }
+
+.moodIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeUp 0.3s ease;
+}
+
+/* Floating Action Button */
+.fab {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(139,92,246,0.5);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.fab:hover {
+  background: #9d71fa;
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 6px 28px rgba(139,92,246,0.7);
+}

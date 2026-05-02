@@ -1,0 +1,118 @@
+.page { min-height: 100vh; }
+.inner { max-width: 1000px; margin: 0 auto; padding: 24px 24px 80px; }
+
+.header {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 28px;
+}
+.pageTitle {
+  font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; flex: 1;
+}
+.headerActions { display: flex; gap: 8px; }
+
+.body {
+  display: grid; grid-template-columns: 1fr 340px;
+  gap: 24px; align-items: start;
+}
+.left { display: flex; flex-direction: column; gap: 16px; }
+.right { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.fieldHint { font-size: 11.5px; color: var(--text-muted); }
+
+/* Review section */
+.reviewSection {
+  background: var(--glass); border: 1px solid rgba(139,92,246,0.2);
+  border-radius: var(--radius); padding: 18px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.reviewHint { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+.resolvedBlock { background: var(--glass); border-radius: var(--radius); padding: 14px; }
+.actualText { font-size: 13.5px; color: var(--text-dim); line-height: 1.65; margin-top: 6px; }
+
+.error { font-size: 13px; color: #f87171; }
+
+/* AI Analysis card */
+.analysisCard { display: flex; flex-direction: column; gap: 14px; }
+.analysisTop { display: flex; gap: 8px; flex-wrap: wrap; }
+.moodTag {
+  font-size: 12px; font-weight: 600; color: #a78bfa;
+  background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.2);
+  padding: 3px 10px; border-radius: 20px; text-transform: capitalize;
+}
+.confTag {
+  font-size: 12px; font-weight: 600; padding: 3px 10px;
+  border-radius: 20px; border: 1px solid;
+}
+.confTag[data-level="high"]   { color: #2ECC71; background: #2ECC7118; border-color: #2ECC7133; }
+.confTag[data-level="medium"] { color: #E8A838; background: #E8A83818; border-color: #E8A83833; }
+.confTag[data-level="low"]    { color: #E74C3C; background: #E74C3C18; border-color: #E74C3C33; }
+
+.coreBet { }
+.coreBetText {
+  font-size: 14px; font-style: italic; color: var(--text);
+  line-height: 1.6; border-left: 3px solid var(--accent);
+  padding-left: 14px; margin-top: 4px;
+}
+
+.aiList { }
+.aiList ul { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.aiList li {
+  font-size: 13px; color: var(--text-dim); line-height: 1.5;
+  padding-left: 14px; position: relative;
+}
+.aiList li::before { content: '–'; position: absolute; left: 0; color: var(--text-muted); }
+
+/* Verdict card */
+.verdictCard {
+  background: color-mix(in srgb, var(--verdict-color, #888) 8%, var(--bg2));
+  border: 1px solid color-mix(in srgb, var(--verdict-color, #888) 25%, transparent);
+  border-radius: var(--radius-lg); padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.verdictBadge {
+  font-size: 20px; font-weight: 700;
+  color: var(--verdict-color, #888);
+}
+.accuracyBar {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--text-dim);
+}
+.accuracyFill {
+  height: 5px; border-radius: 3px;
+  background: var(--verdict-color, #888); flex-shrink: 0;
+}
+.verdictReflection {
+  font-size: 13.5px; color: var(--text-dim); line-height: 1.65;
+  font-style: italic; margin: 0;
+  border-left: 3px solid var(--verdict-color, #888); padding-left: 14px;
+}
+.keyLearning {
+  background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 14px;
+}
+.keyLearningLabel {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--verdict-color, #888); display: block; margin-bottom: 5px;
+}
+.keyLearning p { font-size: 13.5px; color: var(--text); line-height: 1.5; font-weight: 500; }
+
+.outcomeDetail {
+  display: flex; flex-direction: column; gap: 3px;
+}
+.outcomeDetail span {
+  font-size: 11px; font-weight: 700; color: var(--c, #888);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.outcomeDetail p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+.emptyAnalysis {
+  background: var(--glass); border: 1px dashed var(--border);
+  border-radius: var(--radius-lg); padding: 28px;
+  text-align: center; color: var(--text-muted);
+  font-size: 13px; line-height: 1.7;
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+
+@media (max-width: 768px) {
+  .body { grid-template-columns: 1fr; }
+  .right { position: static; }
+}

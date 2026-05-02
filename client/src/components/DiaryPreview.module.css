@@ -1,0 +1,49 @@
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.dateStr { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+
+.moodBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding: 10px 14px;
+  background: var(--glass);
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--mood, #8b5cf6) 20%, var(--border));
+}
+
+.imageWrap { border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.image { width: 100%; max-height: 200px; object-fit: cover; display: block; }
+
+.summaryBlock, .reflectionBlock, .bodyPreview {
+  margin-bottom: 14px;
+}
+.summaryText { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+.reflectionText {
+  font-size: 14px; color: var(--text-dim); line-height: 1.6;
+  font-style: italic;
+  padding: 12px 16px;
+  background: var(--glass);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+}
+.bodyText { font-size: 13.5px; color: var(--text-dim); line-height: 1.7; }
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}

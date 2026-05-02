@@ -1,0 +1,24 @@
+.page { min-height: 100vh; display: flex; flex-direction: column; }
+
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 40px;
+  border-bottom: 1px solid var(--border);
+}
+.sub { font-size: 13px; color: var(--text-muted); }
+
+.stats { display: flex; align-items: center; gap: 10px; }
+.statBadge {
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  background: var(--accent-dim); border: 1px solid rgba(139,92,246,0.2);
+  padding: 5px 12px; border-radius: 20px;
+}
+
+.main { flex: 1; padding: 32px 24px 80px; }
+
+.loader { display: flex; justify-content: center; padding: 80px; }
+
+@media (max-width: 600px) {
+  .header { padding: 20px; }
+  .main { padding: 20px 12px 80px; }
+}
