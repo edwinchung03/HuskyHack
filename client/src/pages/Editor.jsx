@@ -43,7 +43,7 @@ export default function Editor() {
           });
         }
       })
-      .catch(() => {}); // new entry — no existing data
+      .catch(() => {});
   }, [date]);
 
   async function handleAnalyze() {
@@ -91,6 +91,32 @@ export default function Editor() {
     setBody(prev => prev ? `${prev}\n\n${text}` : text);
   }
 
+  async function deleteImage() {
+    if (!imagePath) return;
+    const filename = imagePath.split('/').pop();
+    await fetch(`/upload/${filename}`, { method: 'DELETE' });
+    if (entryId) {
+      await fetch(`/entries/${entryId}/clear`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: 'image_path' }),
+      });
+    }
+    setImagePath(null);
+  }
+
+  async function deleteText() {
+    if (!body.trim()) return;
+    if (entryId) {
+      await fetch(`/entries/${entryId}/clear`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: 'body' }),
+      });
+    }
+    setBody('');
+  }
+
   const moodCfg = analysis ? (MOOD_CONFIG[analysis.mood] || MOOD_CONFIG.neutral) : null;
 
   return (
@@ -117,7 +143,6 @@ export default function Editor() {
 
       <div className={styles.body}>
         <div className={styles.left}>
-          {/* Title */}
           <input
             className={styles.titleInput}
             placeholder="Give this day a title…"
@@ -125,15 +150,24 @@ export default function Editor() {
             onChange={e => setTitle(e.target.value)}
           />
 
-          {/* Audio */}
           <AudioRecorder
             onTranscript={handleTranscript}
             onAudioSaved={setAudioPath}
           />
 
-          {/* Body */}
           <div>
-            <p className="section-label" style={{ marginTop: 16, marginBottom: 6 }}>Your Entry</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16, marginBottom: 6 }}>
+              <p className="section-label">Your Entry</p>
+              {body.trim() && (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={deleteText}
+                  style={{ color: '#e84040' }}
+                >
+                  ✕ Clear text
+                </button>
+              )}
+            </div>
             <textarea
               className={styles.bodyTextarea}
               placeholder="What happened today? How are you feeling? Let it all out…"
@@ -143,7 +177,6 @@ export default function Editor() {
             />
           </div>
 
-          {/* Analyze button */}
           <button
             className="btn btn-secondary"
             onClick={handleAnalyze}
@@ -156,16 +189,15 @@ export default function Editor() {
           {error && <p className={styles.error}>{error}</p>}
         </div>
 
-        {/* Right panel */}
         <div className={styles.right}>
           <ImagePanel
             mood={analysis?.mood}
             imagePrompt={analysis?.image_prompt}
             onImageSaved={setImagePath}
             savedImagePath={imagePath}
+            onDeleteImage={deleteImage}
           />
 
-          {/* AI Reflection */}
           {analysis && (
             <div className={`card ${styles.analysisCard} fade-up`}>
               <p className="section-label">AI Reflection</p>

@@ -2,7 +2,6 @@ import { useRef, useState, useEffect } from 'react';
 import { uploadImage } from '../api';
 import styles from './ImagePanel.module.css';
 
-// Generates procedural mood-based art on a canvas (always works, no API needed)
 function drawMoodArt(canvas, mood, seed = Date.now()) {
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
@@ -21,7 +20,6 @@ function drawMoodArt(canvas, mood, seed = Date.now()) {
     neutral:    ['#6C757D','#868E96','#ADB5BD','#495057','#343A40'],
   };
   const colors = palettes[mood] || palettes.neutral;
-  const bg = colors[0] + '22';
 
   ctx.fillStyle = '#0d0e1c';
   ctx.fillRect(0, 0, w, h);
@@ -35,7 +33,6 @@ function drawMoodArt(canvas, mood, seed = Date.now()) {
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
   }
 
-  // Mood-specific patterns
   if (mood === 'calm' || mood === 'reflective') {
     ctx.strokeStyle = colors[0] + '44';
     ctx.lineWidth = 1;
@@ -71,7 +68,7 @@ function drawMoodArt(canvas, mood, seed = Date.now()) {
   }
 }
 
-export default function ImagePanel({ mood, imagePrompt, onImageSaved, savedImagePath }) {
+export default function ImagePanel({ mood, imagePrompt, onImageSaved, savedImagePath, onDeleteImage }) {
   const canvasRef  = useRef(null);
   const fileRef    = useRef(null);
   const [preview, setPreview] = useState(savedImagePath || null);
@@ -79,6 +76,11 @@ export default function ImagePanel({ mood, imagePrompt, onImageSaved, savedImage
 
   useEffect(() => {
     if (savedImagePath) setPreview(savedImagePath);
+  }, [savedImagePath]);
+
+  // Sync preview to null when parent clears imagePath
+  useEffect(() => {
+    if (!savedImagePath) setPreview(null);
   }, [savedImagePath]);
 
   function generateArt() {
@@ -97,13 +99,18 @@ export default function ImagePanel({ mood, imagePrompt, onImageSaved, savedImage
   async function handleUpload(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
+    setPreview(URL.createObjectURL(file));
     setUploading(true);
     try {
       const res = await uploadImage(file);
       if (res.path) { setPreview(res.path); onImageSaved(res.path); }
     } finally { setUploading(false); }
+  }
+
+  async function handleDelete() {
+    setPreview(null);
+    onImageSaved(null);
+    if (onDeleteImage) await onDeleteImage();
   }
 
   return (
@@ -112,10 +119,21 @@ export default function ImagePanel({ mood, imagePrompt, onImageSaved, savedImage
 
       {preview ? (
         <div className={styles.previewWrap}>
-          <img src={preview} alt="Entry" className={styles.preview} />
-          <button className="btn btn-ghost btn-sm" style={{ marginTop: 8 }} onClick={() => { setPreview(null); onImageSaved(null); }}>
-            Remove
-          </button>
+          <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+            <img src={preview} alt="Entry" className={styles.preview} />
+            <button
+              onClick={handleDelete}
+              style={{
+                position: 'absolute', top: 8, right: 8,
+                background: '#e84040', color: '#fff',
+                border: 'none', borderRadius: 6,
+                padding: '4px 10px', cursor: 'pointer',
+                fontSize: 12, fontWeight: 600,
+              }}
+            >
+              ✕ Remove
+            </button>
+          </div>
         </div>
       ) : (
         <div className={styles.placeholder}>

@@ -27,4 +27,14 @@ router.post('/image', upload.single('image'), (req, res) => {
   res.json({ path: `/uploads/${req.file.filename}` });
 });
 
+//delete uploads
+router.delete('/:filename', (req, res) => {
+  const filename = path.basename(req.params.filename); // prevent path traversal
+  const filePath = path.join(uploadsDir, filename);
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
+  fs.unlinkSync(filePath);
+  res.json({ success: true });
+});
+
+
 module.exports = router;

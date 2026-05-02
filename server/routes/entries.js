@@ -64,4 +64,16 @@ router.delete('/:id', (req, res) => {
   res.json({ success: true });
 });
 
+
+//delete upload
+router.patch('/:id/clear', (req, res) => {
+  const db = getDb();
+  const { field } = req.body; // e.g. "image_path", "audio_path", "body", "title"
+  const allowed = ['image_path', 'audio_path', 'body', 'title', 'ai_summary', 'ai_reflection'];
+  if (!allowed.includes(field)) return res.status(400).json({ error: 'Invalid field' });
+  db.prepare(`UPDATE entries SET ${field} = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+    .run(req.params.id);
+  res.json(db.prepare('SELECT * FROM entries WHERE id = ?').get(req.params.id));
+});
+
 module.exports = router;
