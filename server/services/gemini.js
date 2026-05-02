@@ -16,22 +16,9 @@ const MOOD_SHAPES = {
   easy: 'circle',
 };
 
-const MOOD_ALIASES = {
-  happy: 'positive',
-  excited: 'positive',
-  grateful: 'positive',
-  sad: 'negative',
-  angry: 'negative',
-  anxious: 'disturbed',
-  calm: 'easy',
-  reflective: 'easy',
-  nostalgic: 'neutral',
-  distrubed: 'disturbed',
-};
-
 function normalizeMood(mood = 'neutral') {
   const key = String(mood).toLowerCase();
-  return MOOD_COLORS[key] ? key : (MOOD_ALIASES[key] || 'neutral');
+  return MOOD_COLORS[key] ? key : 'neutral';
 }
 
 function getGenAI() {

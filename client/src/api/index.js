@@ -11,7 +11,10 @@ async function req(method, path, body) {
   const res = await fetch(`${BASE}${path}`, opts);
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error || 'Request failed');
+    const error = new Error(err.error || 'Request failed');
+    error.status = res.status;
+    Object.assign(error, err);
+    throw error;
   }
   return res.json();
 }

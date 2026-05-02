@@ -1,6 +1,6 @@
 :root {
-  --bg:          #efe2d0;
-  --bg2:         #f7efe2;
+  --bg:          #fbf6ef;
+  --bg2:         #fdf8f1;
   --glass:       rgba(255, 249, 240, 0.72);
   --glass-hover: rgba(255, 248, 237, 0.9);
   --border:      rgba(133, 101, 73, 0.18);
@@ -25,8 +25,8 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   background-image:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(244, 223, 196, 0.95) 0%, transparent 70%),
-    linear-gradient(180deg, #f6ecdf 0%, #efe2d0 100%);
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(244, 223, 196, 0.72) 0%, transparent 70%),
+    linear-gradient(180deg, #fffaf3 0%, #f6eee2 100%);
 }
 
 ::-webkit-scrollbar { width: 5px; }
@@ -53,7 +53,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(247, 239, 226, 0.88);
+  background: rgba(196, 168, 138, 0.96);
+  box-shadow: 0 10px 26px rgba(111, 82, 54, 0.16);
 }
 
 .nav-logo {
@@ -61,13 +62,13 @@ body {
   align-items: center;
   gap: 8px;
   font-family: 'Playfair Display', serif;
-  font-size: 22px;
+  font-size: 32px;
   font-weight: 700;
-  color: #6a4b32;
+  color: #fff7ec;
 }
 
 .nav-logo-icon {
-  color: #6a4b32;
+  color: #fff7ec;
   font-size: 18px;
 }
 
@@ -87,18 +88,18 @@ body {
 }
 
 .nav-link {
-  color: var(--text-dim);
+  color: rgba(255, 247, 236, 0.8);
 }
 
 .nav-link:hover {
-  color: var(--text);
-  background: var(--glass);
+  color: #fffdf9;
+  background: rgba(255, 247, 236, 0.14);
 }
 
 .nav-link.active {
-  color: var(--text);
-  background: var(--accent-dim);
-  border: 1px solid rgba(183, 121, 75, 0.25);
+  color: #fffdf9;
+  background: rgba(255, 247, 236, 0.18);
+  border: 1px solid rgba(255, 247, 236, 0.28);
 }
 
 /* ---------- Buttons ---------- */

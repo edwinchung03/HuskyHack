@@ -73,7 +73,7 @@ export default function Calendar({ entries = [], onDayClick, onNewEntry }) {
       {/* + New diary button */}
       <button
         className={styles.fab}
-        onClick={() => onNewEntry(format(new Date(), 'yyyy-MM-dd'))}
+        onClick={() => onNewEntry()}
         title="New diary entry"
       >
         +

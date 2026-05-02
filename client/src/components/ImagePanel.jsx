@@ -15,20 +15,7 @@ function drawMoodArt(canvas, mood, seed = Date.now()) {
     disturbed: ['#6e7f64','#7f8f74','#93a388','#adb8a4','#c8d0c2'],
     easy:      ['#d8bc97','#e5cda8','#eedcc2','#f6ead7','#fbf4eb'],
   };
-  const normalizedMood = ['positive', 'negative', 'neutral', 'disturbed', 'easy'].includes(mood) ? mood : (
-    {
-      happy: 'positive',
-      excited: 'positive',
-      grateful: 'positive',
-      sad: 'negative',
-      angry: 'negative',
-      anxious: 'disturbed',
-      calm: 'easy',
-      reflective: 'easy',
-      nostalgic: 'neutral',
-      distrubed: 'disturbed',
-    }[mood] || 'neutral'
-  );
+  const normalizedMood = ['positive', 'negative', 'neutral', 'disturbed', 'easy'].includes(mood) ? mood : 'neutral';
   const colors = palettes[normalizedMood] || palettes.neutral;
   const bg = colors[0] + '22';
 
