@@ -6,3 +6,5 @@ server/diary.sqlite-shm
 server/diary.sqlite-wal
 client/dist/
 *.log
+.env.example
+.claude
