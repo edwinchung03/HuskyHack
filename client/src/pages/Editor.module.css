@@ -42,10 +42,52 @@
 .titleInput:focus { outline: none; border-color: var(--accent); }
 .titleInput::placeholder { color: var(--text-muted); }
 
-.bodyTextarea {
-  font-size: 14.5px; line-height: 1.8;
-  min-height: 220px;
-  border-radius: var(--radius);
+.editorShell {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 248, 237, 0.72);
+}
+
+.bodyEditor {
+  min-height: 260px;
+  padding: 18px 16px;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.8;
+  outline: none;
+}
+
+.bodyEditor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+}
+
+.bodyEditor p,
+.bodyEditor ul,
+.bodyEditor ol,
+.bodyEditor h3,
+.bodyEditor blockquote {
+  margin: 0 0 12px;
+}
+
+.bodyEditor ul,
+.bodyEditor ol {
+  padding-left: 22px;
+}
+
+.bodyEditor h3 {
+  font-size: 18px;
+  font-family: 'Playfair Display', serif;
 }
 
 .analysisCard { display: flex; flex-direction: column; gap: 12px; }

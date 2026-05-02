@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import Nav from '../components/Nav';
 import Calendar from '../components/Calendar';
-import DiaryPreview from '../components/DiaryPreview';
 import AICompanion from '../components/AICompanion';
-import { getEntries, getEntry } from '../api';
+import { getEntries } from '../api';
 import styles from './Home.module.css';
 
 export default function Home() {
   const [entries, setEntries]       = useState([]);
-  const [preview, setPreview]       = useState(null);
   const [loading, setLoading]       = useState(true);
   const [showDateModal, setShowDateModal] = useState(false);
   const [newEntryDate, setNewEntryDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -23,17 +21,8 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  async function handleDayClick(dateStr, entrySummary) {
-    if (!entrySummary) {
-      navigate(`/editor/${dateStr}`);
-      return;
-    }
-    try {
-      const full = await getEntry(dateStr);
-      setPreview(full);
-    } catch {
-      setPreview(entrySummary);
-    }
+  function handleDayClick(dateStr) {
+    navigate(`/editor/${dateStr}`);
   }
 
   function handleNewEntry() {
@@ -61,14 +50,6 @@ export default function Home() {
           />
         )}
       </main>
-
-      {preview && (
-        <DiaryPreview
-          entry={preview}
-          onClose={() => setPreview(null)}
-          onEdit={() => { navigate(`/editor/${preview.date}`); setPreview(null); }}
-        />
-      )}
 
       {showDateModal && (
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowDateModal(false)}>

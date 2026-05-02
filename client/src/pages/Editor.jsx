@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import AudioRecorder from '../components/AudioRecorder';
@@ -7,11 +7,41 @@ import MoodShape, { MOOD_CONFIG, normalizeMood } from '../components/MoodShape';
 import { getEntry, saveEntry, updateEntry, analyzeEntry } from '../api';
 import styles from './Editor.module.css';
 
+function escapeHtml(text = '') {
+  return text
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function isRichHtml(value = '') {
+  return /<\/?(p|div|br|ul|ol|li|strong|b|em|i|u|h1|h2|h3|blockquote)\b/i.test(value);
+}
+
+function normalizeBodyForEditor(value = '') {
+  if (!value) return '';
+  if (isRichHtml(value)) return value;
+  return value
+    .split(/\n{2,}/)
+    .map(block => `<p>${escapeHtml(block).replace(/\n/g, '<br />')}</p>`)
+    .join('');
+}
+
+function getPlainTextFromHtml(value = '') {
+  if (typeof document === 'undefined') return value.replace(/<[^>]+>/g, ' ');
+  const temp = document.createElement('div');
+  temp.innerHTML = value;
+  return (temp.textContent || temp.innerText || '').replace(/\u00a0/g, ' ').trim();
+}
+
 export default function Editor() {
   const { date }   = useParams();
   const navigate   = useNavigate();
   const location = useLocation();
   const isNewMode = location.state?.mode === 'new';
+  const editorRef = useRef(null);
 
   const [title, setTitle]         = useState('');
   const [body, setBody]           = useState('');
@@ -45,7 +75,7 @@ export default function Editor() {
     getEntry(date)
       .then(e => {
         setTitle(e.title || '');
-        setBody(e.body || '');
+        setBody(normalizeBodyForEditor(e.body || ''));
         setAudioPath(e.audio_path || null);
         setImagePath(e.image_path || null);
         setEntryId(e.id);
@@ -70,8 +100,14 @@ export default function Editor() {
       });
   }, [date, isNewMode]);
 
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== body) {
+      editorRef.current.innerHTML = body || '';
+    }
+  }, [body]);
+
   async function handleAnalyze() {
-    const text = body.trim();
+    const text = getPlainTextFromHtml(body);
     if (!text) { setError('Write something first before analyzing.'); return; }
     setError('');
     setAnalyzing(true);
@@ -87,10 +123,11 @@ export default function Editor() {
   async function handleSave() {
     setError('');
     setSaving(true);
+    const editorHtml = editorRef.current?.innerHTML || body || '';
     const payload = {
       date,
       title: title.trim() || dateLabel,
-      body,
+      body: editorHtml,
       audio_path: audioPath,
       image_path: imagePath,
       mood_label:    analysis?.mood        || 'neutral',
@@ -104,6 +141,7 @@ export default function Editor() {
       const entry = entryId
         ? await updateEntry(entryId, payload)
         : await saveEntry(payload);
+      setBody(editorHtml);
       setEntryId(entry.id);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
@@ -124,7 +162,7 @@ export default function Editor() {
       const entry = await saveEntry({
         date,
         title: title.trim() || dateLabel,
-        body,
+        body: editorRef.current?.innerHTML || body || '',
         audio_path: audioPath,
         image_path: imagePath,
         mood_label:    analysis?.mood        || 'neutral',
@@ -146,8 +184,19 @@ export default function Editor() {
     setSaving(false);
   }
 
-  function handleTranscript(text) {
-    setBody(prev => prev ? `${prev}\n\n${text}` : text);
+  function handleUseTranscript(text) {
+    const transcriptHtml = normalizeBodyForEditor(text);
+    setBody(prev => prev ? `${prev}${transcriptHtml}` : transcriptHtml);
+  }
+
+  function handleBodyInput(e) {
+    setBody(e.currentTarget.innerHTML);
+  }
+
+  function applyFormat(command, value = null) {
+    editorRef.current?.focus();
+    document.execCommand(command, false, value);
+    setBody(editorRef.current?.innerHTML || '');
   }
 
   const normalizedMood = analysis ? normalizeMood(analysis.mood) : null;
@@ -187,27 +236,39 @@ export default function Editor() {
 
           {/* Audio */}
           <AudioRecorder
-            onTranscript={handleTranscript}
+            onUseTranscript={handleUseTranscript}
             onAudioSaved={setAudioPath}
           />
 
           {/* Body */}
           <div>
-            <p className="section-label" style={{ marginTop: 16, marginBottom: 6 }}>Your Entry</p>
-            <textarea
-              className={styles.bodyTextarea}
-              placeholder="What happened today? How are you feeling? Let it all out…"
-              value={body}
-              onChange={e => setBody(e.target.value)}
-              rows={10}
-            />
+            <p className="section-label" style={{ marginTop: 16, marginBottom: 6 }}>Write down what happened today</p>
+            <div className={styles.editorShell}>
+              <div className={styles.toolbar}>
+                <button type="button" className="btn btn-ghost btn-sm" onMouseDown={e => e.preventDefault()} onClick={() => applyFormat('bold')}><strong>B</strong></button>
+                <button type="button" className="btn btn-ghost btn-sm" onMouseDown={e => e.preventDefault()} onClick={() => applyFormat('italic')}><em>I</em></button>
+                <button type="button" className="btn btn-ghost btn-sm" onMouseDown={e => e.preventDefault()} onClick={() => applyFormat('underline')}><u>U</u></button>
+                <button type="button" className="btn btn-ghost btn-sm" onMouseDown={e => e.preventDefault()} onClick={() => applyFormat('insertUnorderedList')}>• List</button>
+                <button type="button" className="btn btn-ghost btn-sm" onMouseDown={e => e.preventDefault()} onClick={() => applyFormat('insertOrderedList')}>1. List</button>
+                <button type="button" className="btn btn-ghost btn-sm" onMouseDown={e => e.preventDefault()} onClick={() => applyFormat('formatBlock', '<h3>')}>Heading</button>
+                <button type="button" className="btn btn-ghost btn-sm" onMouseDown={e => e.preventDefault()} onClick={() => applyFormat('removeFormat')}>Clear</button>
+              </div>
+              <div
+                ref={editorRef}
+                className={styles.bodyEditor}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={handleBodyInput}
+                data-placeholder="What happened today? How are you feeling? Let it all out…"
+              />
+            </div>
           </div>
 
           {/* Analyze button */}
           <button
             className="btn btn-secondary"
             onClick={handleAnalyze}
-            disabled={analyzing || !body.trim()}
+            disabled={analyzing || !getPlainTextFromHtml(body)}
             style={{ marginTop: 8 }}
           >
             {analyzing ? <><span className="spinner" /> Analyzing…</> : '✦ AI Analyze'}

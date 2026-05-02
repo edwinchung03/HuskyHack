@@ -21,14 +21,19 @@ function normalizeMood(mood = 'neutral') {
   return MOOD_COLORS[key] ? key : 'neutral';
 }
 
+function requireGeminiKey() {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY is not configured');
+  }
+}
+
 function getGenAI() {
+  requireGeminiKey();
   return new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 }
 
 async function analyzeEntry(text) {
-  if (!process.env.GEMINI_API_KEY) return getMockAnalysis();
-
-  const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash' });
 
   const prompt = `Analyze this diary entry and respond with ONLY a valid JSON object, no markdown fences, no explanation:
 {
@@ -55,10 +60,6 @@ ${text}`;
 }
 
 async function transcribeAudio(audioBuffer, mimeType = 'audio/webm') {
-  if (!process.env.GEMINI_API_KEY) {
-    return { transcript: '[Add GEMINI_API_KEY to .env to enable audio transcription]' };
-  }
-
   const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
   const result = await model.generateContent([
     { inlineData: { mimeType, data: audioBuffer.toString('base64') } },
@@ -68,10 +69,6 @@ async function transcribeAudio(audioBuffer, mimeType = 'audio/webm') {
 }
 
 async function chatWithContext(userMessage, memories = []) {
-  if (!process.env.GEMINI_API_KEY) {
-    return { reply: 'Add GEMINI_API_KEY to .env to enable the AI companion.' };
-  }
-
   const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   const memoryBlock = memories.length
@@ -87,8 +84,6 @@ User: ${userMessage}`;
 }
 
 async function analyzeDecision(title, assumption, expectedOutcome, context) {
-  if (!process.env.GEMINI_API_KEY) return getMockDecisionAnalysis();
-
   const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
   const prompt = `You are a sharp advisor analyzing a founder's business assumption. Respond ONLY with valid JSON, no markdown:
 {
@@ -113,8 +108,6 @@ Context: ${context || 'none'}`;
 }
 
 async function reflectOnDecision(title, assumption, expectedOutcome, actualOutcome) {
-  if (!process.env.GEMINI_API_KEY) return getMockDecisionReflection();
-
   const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
   const prompt = `You are reflecting on a founder's decision outcome. Respond ONLY with valid JSON, no markdown:
 {
@@ -137,40 +130,6 @@ Actual outcome: ${actualOutcome}`;
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Gemini returned invalid JSON');
   return JSON.parse(jsonMatch[0]);
-}
-
-function getMockDecisionAnalysis() {
-  return {
-    confidence: 'medium',
-    core_bet: 'AI analysis requires a Gemini API key.',
-    blind_spots: ['Add GEMINI_API_KEY to server/.env to unlock AI analysis.'],
-    questions: ['What would prove this assumption wrong?'],
-    mood: 'neutral',
-    summary: 'Add your API key to get AI analysis of this decision.',
-  };
-}
-
-function getMockDecisionReflection() {
-  return {
-    verdict: 'mixed',
-    accuracy_score: 50,
-    what_got_right: null,
-    what_missed: null,
-    key_learning: 'Add GEMINI_API_KEY to server/.env to unlock AI reflections.',
-    reflection: 'Once you add your Gemini API key, I\'ll help you reflect on whether your assumptions held up.',
-    memory: null,
-  };
-}
-
-function getMockAnalysis() {
-  return {
-    mood: 'neutral',
-    mood_color: MOOD_COLORS.neutral,
-    mood_shape: MOOD_SHAPES.neutral,
-    summary: 'AI analysis is not available yet — add GEMINI_API_KEY to your .env file.',
-    reflection: 'Once you add your Gemini API key, I\'ll be able to reflect on your entries and help you grow.',
-    image_prompt: 'An abstract painting of a quiet moment, soft muted colors, impressionist style',
-  };
 }
 
 module.exports = { analyzeEntry, transcribeAudio, chatWithContext, analyzeDecision, reflectOnDecision, MOOD_COLORS, MOOD_SHAPES };

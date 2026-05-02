@@ -1,7 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+const dotenv = require('dotenv');
+
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const entriesRouter   = require('./routes/entries');
 const decisionsRouter = require('./routes/decisions');
@@ -22,6 +25,6 @@ app.use('/api/upload', uploadRouter);
 
 app.listen(PORT, () => {
   console.log(`🐾 HuskyDiary server running on http://localhost:${PORT}`);
-  if (!process.env.GEMINI_API_KEY) console.warn('⚠  GEMINI_API_KEY not set — AI features will use mock responses');
+  if (!process.env.GEMINI_API_KEY) console.warn('⚠  GEMINI_API_KEY not set — AI features will fail until it is configured');
   if (!process.env.BACKBOARD_API_KEY) console.warn('⚠  BACKBOARD_API_KEY not set — AI memory features disabled');
 });
