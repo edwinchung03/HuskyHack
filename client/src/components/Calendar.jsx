@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameMonth, isToday } from 'date-fns';
-import MoodShape, { MOOD_CONFIG } from './MoodShape';
+import MoodShape, { MOOD_CONFIG, normalizeMood } from './MoodShape';
 import styles from './Calendar.module.css';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -44,7 +44,7 @@ export default function Calendar({ entries = [], onDayClick, onNewEntry }) {
           const dateStr = format(day, 'yyyy-MM-dd');
           const entry   = entryMap[dateStr];
           const today   = isToday(day);
-          const moodCfg = entry ? (MOOD_CONFIG[entry.mood_label] || MOOD_CONFIG.neutral) : null;
+          const moodCfg = entry ? (MOOD_CONFIG[normalizeMood(entry.mood_label)] || MOOD_CONFIG.neutral) : null;
 
           return (
             <button

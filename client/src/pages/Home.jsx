@@ -40,14 +40,6 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <Nav />
-      <header className={styles.header}>
-        <div>
-          <p className={styles.sub}>Your AI-powered memory companion</p>
-        </div>
-        <div className={styles.stats}>
-          <span className={styles.statBadge}>{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</span>
-        </div>
-      </header>
 
       <main className={styles.main}>
         {loading ? (

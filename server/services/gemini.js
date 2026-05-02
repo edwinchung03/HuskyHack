@@ -1,30 +1,38 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const MOOD_COLORS = {
-  happy:      '#FFD700',
-  excited:    '#FF6B35',
-  calm:       '#4ECDC4',
-  sad:        '#5B8DB8',
-  anxious:    '#9B59B6',
-  angry:      '#E74C3C',
-  reflective: '#A0A8C0',
-  neutral:    '#6C757D',
-  grateful:   '#2ECC71',
-  nostalgic:  '#E8A838',
+  positive:  '#c78b5d',
+  negative:  '#8e6a4f',
+  neutral:   '#9f8b76',
+  disturbed: '#6e7f64',
+  easy:      '#d8bc97',
 };
 
 const MOOD_SHAPES = {
-  happy:      'star',
-  excited:    'lightning',
-  calm:       'circle',
-  sad:        'teardrop',
-  anxious:    'spiral',
-  angry:      'flame',
-  reflective: 'moon',
-  neutral:    'diamond',
-  grateful:   'heart',
-  nostalgic:  'leaf',
+  positive: 'star',
+  negative: 'teardrop',
+  neutral: 'diamond',
+  disturbed: 'spiral',
+  easy: 'circle',
 };
+
+const MOOD_ALIASES = {
+  happy: 'positive',
+  excited: 'positive',
+  grateful: 'positive',
+  sad: 'negative',
+  angry: 'negative',
+  anxious: 'disturbed',
+  calm: 'easy',
+  reflective: 'easy',
+  nostalgic: 'neutral',
+  distrubed: 'disturbed',
+};
+
+function normalizeMood(mood = 'neutral') {
+  const key = String(mood).toLowerCase();
+  return MOOD_COLORS[key] ? key : (MOOD_ALIASES[key] || 'neutral');
+}
 
 function getGenAI() {
   return new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -37,7 +45,7 @@ async function analyzeEntry(text) {
 
   const prompt = `Analyze this diary entry and respond with ONLY a valid JSON object, no markdown fences, no explanation:
 {
-  "mood": "one of: happy, excited, calm, sad, anxious, angry, reflective, neutral, grateful, nostalgic",
+  "mood": "one of: positive, negative, neutral, disturbed, easy",
   "summary": "2-3 sentence summary of what happened",
   "reflection": "A warm, empathetic 2-3 sentence reflection as a supportive AI companion who knows this person well. Be personal and insightful.",
   "image_prompt": "A vivid, artistic Stable Diffusion prompt that captures the mood and essence of this diary entry. No people, no text. Painterly and evocative."
@@ -52,7 +60,8 @@ ${text}`;
   if (!jsonMatch) throw new Error('Gemini returned invalid JSON');
 
   const analysis = JSON.parse(jsonMatch[0]);
-  const moodKey = analysis.mood?.toLowerCase() || 'neutral';
+  const moodKey = normalizeMood(analysis.mood);
+  analysis.mood = moodKey;
   analysis.mood_color = MOOD_COLORS[moodKey] || MOOD_COLORS.neutral;
   analysis.mood_shape = MOOD_SHAPES[moodKey] || MOOD_SHAPES.neutral;
   return analysis;

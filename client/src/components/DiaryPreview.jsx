@@ -1,10 +1,10 @@
 import { format, parseISO } from 'date-fns';
-import MoodShape, { MOOD_CONFIG } from './MoodShape';
+import MoodShape, { MOOD_CONFIG, normalizeMood } from './MoodShape';
 import styles from './DiaryPreview.module.css';
 
 export default function DiaryPreview({ entry, onClose, onEdit }) {
   if (!entry) return null;
-  const moodCfg = MOOD_CONFIG[entry.mood_label] || MOOD_CONFIG.neutral;
+  const moodCfg = MOOD_CONFIG[normalizeMood(entry.mood_label)] || MOOD_CONFIG.neutral;
   const dateLabel = format(parseISO(entry.date), 'EEEE, MMMM d, yyyy');
 
   return (

@@ -1,18 +1,16 @@
 import { NavLink } from 'react-router-dom';
-import styles from './Nav.module.css';
 
 export default function Nav() {
   return (
-    <header className={styles.nav}>
-      <div className={styles.logo}>
-        <span className={styles.logoIcon}>✦</span>
-        HuskyDiary
+    <header className="nav">
+      <div className="nav-logo">
+        Memories
       </div>
-      <nav className={styles.links}>
-        <NavLink to="/"           end className={({ isActive }) => isActive ? styles.active : styles.link}>
+      <nav className="nav-links">
+        <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           📅 Diary
         </NavLink>
-        <NavLink to="/decisions"      className={({ isActive }) => isActive ? styles.active : styles.link}>
+        <NavLink to="/decisions" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
           🎯 Decisions
         </NavLink>
       </nav>

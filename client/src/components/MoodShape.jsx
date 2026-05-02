@@ -1,14 +1,9 @@
 export const MOOD_CONFIG = {
-  happy:      { color: '#FFD700', label: 'Happy' },
-  excited:    { color: '#FF6B35', label: 'Excited' },
-  calm:       { color: '#4ECDC4', label: 'Calm' },
-  sad:        { color: '#5B8DB8', label: 'Sad' },
-  anxious:    { color: '#9B59B6', label: 'Anxious' },
-  angry:      { color: '#E74C3C', label: 'Angry' },
-  reflective: { color: '#A0A8C0', label: 'Reflective' },
-  neutral:    { color: '#6C757D', label: 'Neutral' },
-  grateful:   { color: '#2ECC71', label: 'Grateful' },
-  nostalgic:  { color: '#E8A838', label: 'Nostalgic' },
+  positive:  { color: '#fca311', label: 'Positive' },
+  negative:  { color: '#540b0e', label: 'Negative' },
+  neutral:   { color: '#e3d5ca', label: 'Neutral' },
+  disturbed: { color: '#335c67', label: 'Disturbed' },
+  easy:      { color: '#a2d2ff', label: 'Easy' },
 };
 
 function Star({ color, size }) {
@@ -33,6 +28,8 @@ function Circle({ color, size }) {
     </svg>
   );
 }
+
+// negative
 function Teardrop({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -40,6 +37,8 @@ function Teardrop({ color, size }) {
     </svg>
   );
 }
+
+// disturbed
 function Spiral({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -48,6 +47,7 @@ function Spiral({ color, size }) {
     </svg>
   );
 }
+
 function Flame({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -55,6 +55,8 @@ function Flame({ color, size }) {
     </svg>
   );
 }
+
+// easy
 function Moon({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -62,13 +64,8 @@ function Moon({ color, size }) {
     </svg>
   );
 }
-function Diamond({ color, size }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24">
-      <polygon points="12,2 22,12 12,22 2,12" fill={color} />
-    </svg>
-  );
-}
+
+// positive
 function Heart({ color, size }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
@@ -90,18 +87,19 @@ const SHAPE_COMPONENTS = {
   moon: Moon, diamond: Diamond, heart: Heart, leaf: Leaf,
 };
 
+export function normalizeMood(mood = 'neutral') {
+  const key = String(mood).toLowerCase();
+  return MOOD_CONFIG[key] ? key : (MOOD_ALIASES[key] || 'neutral');
+}
+
 export default function MoodShape({ mood = 'neutral', size = 22, glow = false }) {
-  const cfg = MOOD_CONFIG[mood] || MOOD_CONFIG.neutral;
+  const normalizedMood = normalizeMood(mood);
+  const cfg = MOOD_CONFIG[normalizedMood] || MOOD_CONFIG.neutral;
   const ShapeComp = SHAPE_COMPONENTS[
-    mood === 'happy' ? 'star' :
-    mood === 'excited' ? 'lightning' :
-    mood === 'calm' ? 'circle' :
-    mood === 'sad' ? 'teardrop' :
-    mood === 'anxious' ? 'spiral' :
-    mood === 'angry' ? 'flame' :
-    mood === 'reflective' ? 'moon' :
-    mood === 'grateful' ? 'heart' :
-    mood === 'nostalgic' ? 'leaf' :
+    normalizedMood === 'positive' ? 'star' :
+    normalizedMood === 'negative' ? 'teardrop' :
+    normalizedMood === 'disturbed' ? 'spiral' :
+    normalizedMood === 'easy' ? 'circle' :
     'diamond'
   ] || Diamond;
 

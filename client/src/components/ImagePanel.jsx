@@ -9,21 +9,30 @@ function drawMoodArt(canvas, mood, seed = Date.now()) {
   const rng = (() => { let s = seed; return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 4294967296; }; })();
 
   const palettes = {
-    happy:      ['#FFD700','#FF9E00','#FFF176','#FFAB40','#FFE082'],
-    excited:    ['#FF6B35','#FF4081','#FF6E40','#FF3D00','#FF6D00'],
-    calm:       ['#4ECDC4','#26A69A','#80CBC4','#00BCD4','#B2EBF2'],
-    sad:        ['#5B8DB8','#3A7BD5','#5C6BC0','#7986CB','#90A4AE'],
-    anxious:    ['#9B59B6','#8E44AD','#CE93D8','#AB47BC','#7B1FA2'],
-    angry:      ['#E74C3C','#C0392B','#FF5252','#FF1744','#B71C1C'],
-    reflective: ['#A0A8C0','#78909C','#B0BEC5','#90A4AE','#607D8B'],
-    grateful:   ['#2ECC71','#27AE60','#A5D6A7','#66BB6A','#43A047'],
-    nostalgic:  ['#E8A838','#F9A825','#FFD54F','#FFB300','#FF8F00'],
-    neutral:    ['#6C757D','#868E96','#ADB5BD','#495057','#343A40'],
+    positive:  ['#d6a171','#c78b5d','#e6c29f','#efd4b4','#f4e3cf'],
+    negative:  ['#8e6a4f','#7b5a43','#aa8365','#c2a28a','#dcc4b4'],
+    neutral:   ['#9f8b76','#b29f8b','#c8b7a6','#ddd1c5','#f0e7dc'],
+    disturbed: ['#6e7f64','#7f8f74','#93a388','#adb8a4','#c8d0c2'],
+    easy:      ['#d8bc97','#e5cda8','#eedcc2','#f6ead7','#fbf4eb'],
   };
-  const colors = palettes[mood] || palettes.neutral;
+  const normalizedMood = ['positive', 'negative', 'neutral', 'disturbed', 'easy'].includes(mood) ? mood : (
+    {
+      happy: 'positive',
+      excited: 'positive',
+      grateful: 'positive',
+      sad: 'negative',
+      angry: 'negative',
+      anxious: 'disturbed',
+      calm: 'easy',
+      reflective: 'easy',
+      nostalgic: 'neutral',
+      distrubed: 'disturbed',
+    }[mood] || 'neutral'
+  );
+  const colors = palettes[normalizedMood] || palettes.neutral;
   const bg = colors[0] + '22';
 
-  ctx.fillStyle = '#0d0e1c';
+  ctx.fillStyle = '#f7efe2';
   ctx.fillRect(0, 0, w, h);
 
   for (let i = 0; i < 6; i++) {
@@ -36,7 +45,7 @@ function drawMoodArt(canvas, mood, seed = Date.now()) {
   }
 
   // Mood-specific patterns
-  if (mood === 'calm' || mood === 'reflective') {
+  if (normalizedMood === 'easy') {
     ctx.strokeStyle = colors[0] + '44';
     ctx.lineWidth = 1;
     for (let i = 0; i < 8; i++) {
@@ -47,14 +56,14 @@ function drawMoodArt(canvas, mood, seed = Date.now()) {
       }
       ctx.stroke();
     }
-  } else if (mood === 'happy' || mood === 'grateful') {
+  } else if (normalizedMood === 'positive') {
     for (let i = 0; i < 30; i++) {
       const x = rng() * w, y = rng() * h, r = 2 + rng() * 5;
       ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
       ctx.fillStyle = colors[i % colors.length] + 'cc';
       ctx.fill();
     }
-  } else if (mood === 'anxious') {
+  } else if (normalizedMood === 'disturbed') {
     ctx.strokeStyle = colors[2] + '66';
     ctx.lineWidth = 1.5;
     const cx = w / 2, cy = h / 2;

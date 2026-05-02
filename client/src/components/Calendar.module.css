@@ -3,6 +3,10 @@
   max-width: 700px;
   margin: 0 auto;
   padding: 0 16px;
+  background: #f9f1e6;
+  border: 1px solid rgba(133, 101, 73, 0.14);
+  border-radius: 24px;
+  box-shadow: 0 14px 34px rgba(111, 82, 54, 0.08);
 }
 
 .header {
@@ -10,7 +14,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
-  padding: 0 4px;
+  padding: 24px 20px 0;
 }
 
 .monthTitle {
@@ -18,16 +22,14 @@
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #ededf5 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #6a4b32;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
+  padding: 0 20px 20px;
 }
 
 .dayLabel {
@@ -77,7 +79,7 @@
 
 .today {
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(139,92,246,0.2);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(248, 239, 223, 0.9);
 }
 
 .hasEntry {
@@ -117,7 +119,7 @@
   line-height: 1;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(139,92,246,0.5);
+  box-shadow: 0 4px 20px rgba(248, 239, 223, 0.95);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -126,7 +128,7 @@
 }
 
 .fab:hover {
-  background: #9d71fa;
+  background: #c59267;
   transform: scale(1.1) rotate(90deg);
-  box-shadow: 0 6px 28px rgba(139,92,246,0.7);
+  box-shadow: 0 6px 28px rgba(248, 239, 223, 1);
 }

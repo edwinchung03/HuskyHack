@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import AudioRecorder from '../components/AudioRecorder';
 import ImagePanel from '../components/ImagePanel';
-import MoodShape, { MOOD_CONFIG } from '../components/MoodShape';
+import MoodShape, { MOOD_CONFIG, normalizeMood } from '../components/MoodShape';
 import { getEntry, saveEntry, analyzeEntry } from '../api';
 import styles from './Editor.module.css';
 
@@ -34,7 +34,7 @@ export default function Editor() {
         setEntryId(e.id);
         if (e.mood_label) {
           setAnalysis({
-            mood: e.mood_label,
+            mood: normalizeMood(e.mood_label),
             mood_color: e.mood_color,
             mood_shape: e.mood_shape,
             summary: e.ai_summary,
@@ -91,7 +91,8 @@ export default function Editor() {
     setBody(prev => prev ? `${prev}\n\n${text}` : text);
   }
 
-  const moodCfg = analysis ? (MOOD_CONFIG[analysis.mood] || MOOD_CONFIG.neutral) : null;
+  const normalizedMood = analysis ? normalizeMood(analysis.mood) : null;
+  const moodCfg = normalizedMood ? (MOOD_CONFIG[normalizedMood] || MOOD_CONFIG.neutral) : null;
 
   return (
     <div className={styles.page}>
