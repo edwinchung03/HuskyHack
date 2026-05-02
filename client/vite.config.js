@@ -5,8 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://localhost:3001',
-      '/uploads': 'http://localhost:3001',
+      '/api': 'https://huskyhack-memories.onrender.com',
+      '/uploads': 'https://huskyhack-memories.onrender.com',
     },
   },
 });
