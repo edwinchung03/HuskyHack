@@ -1,5 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+const MODEL = 'gemini-2.5-flash';
+
 const MOOD_COLORS = {
   happy:      '#FFD700',
   excited:    '#FF6B35',
@@ -33,7 +35,7 @@ function getGenAI() {
 async function analyzeEntry(text) {
   if (!process.env.GEMINI_API_KEY) return getMockAnalysis();
 
-  const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getGenAI().getGenerativeModel({ model: MODEL });
 
   const prompt = `Analyze this diary entry and respond with ONLY a valid JSON object, no markdown fences, no explanation:
 {
@@ -63,7 +65,7 @@ async function transcribeAudio(audioBuffer, mimeType = 'audio/webm') {
     return { transcript: '[Add GEMINI_API_KEY to .env to enable audio transcription]' };
   }
 
-  const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getGenAI().getGenerativeModel({ model: MODEL });
   const result = await model.generateContent([
     { inlineData: { mimeType, data: audioBuffer.toString('base64') } },
     'Transcribe this audio recording exactly as spoken. Return only the transcript text, nothing else.',
@@ -76,7 +78,7 @@ async function chatWithContext(userMessage, memories = []) {
     return { reply: 'Add GEMINI_API_KEY to .env to enable the AI companion.' };
   }
 
-  const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getGenAI().getGenerativeModel({ model: MODEL });
 
   const memoryBlock = memories.length
     ? `Relevant memories from this person's diary:\n${memories.join('\n')}\n\n`
@@ -93,7 +95,7 @@ User: ${userMessage}`;
 async function analyzeDecision(title, assumption, expectedOutcome, context) {
   if (!process.env.GEMINI_API_KEY) return getMockDecisionAnalysis();
 
-  const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getGenAI().getGenerativeModel({ model: MODEL });
   const prompt = `You are a sharp advisor analyzing a founder's business assumption. Respond ONLY with valid JSON, no markdown:
 {
   "confidence": "high|medium|low",
@@ -119,7 +121,7 @@ Context: ${context || 'none'}`;
 async function reflectOnDecision(title, assumption, expectedOutcome, actualOutcome) {
   if (!process.env.GEMINI_API_KEY) return getMockDecisionReflection();
 
-  const model = getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = getGenAI().getGenerativeModel({ model: MODEL });
   const prompt = `You are reflecting on a founder's decision outcome. Respond ONLY with valid JSON, no markdown:
 {
   "verdict": "correct|wrong|mixed",
@@ -177,4 +179,71 @@ function getMockAnalysis() {
   };
 }
 
-module.exports = { analyzeEntry, transcribeAudio, chatWithContext, analyzeDecision, reflectOnDecision, MOOD_COLORS, MOOD_SHAPES };
+async function generateWeeklyReport(entries, weekLabel) {
+  if (!process.env.GEMINI_API_KEY || entries.length === 0) {
+    return getMockWeeklyReport(entries, weekLabel);
+  }
+
+  const model = getGenAI().getGenerativeModel({ model: MODEL });
+
+  const moodCounts = {};
+  entries.forEach(e => { moodCounts[e.mood_label || 'neutral'] = (moodCounts[e.mood_label || 'neutral'] || 0) + 1; });
+  const moodDist = Object.entries(moodCounts).map(([m, c]) => `${m}: ${c} day(s)`).join(', ');
+
+  const entryLines = entries.map(e =>
+    `- ${e.date} [${e.mood_label || 'neutral'}]: "${e.title || 'Untitled'}" — ${e.ai_summary || e.body?.slice(0, 120) || 'No content'}`
+  ).join('\n');
+
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const prompt = `You are a clinical mental health AI assistant generating a structured weekly mood report from personal diary entries. This report may be shared with a healthcare provider or therapist.
+
+Week: ${weekLabel}
+Report generated: ${today}
+Total diary entries this week: ${entries.length}
+Mood distribution: ${moodDist}
+
+Daily entries:
+${entryLines}
+
+Write a professional, factual report using EXACTLY this plain-text format (no markdown, no bullet symbols, use dashes where needed):
+
+WEEKLY MOOD ANALYSIS REPORT
+Period: ${weekLabel}
+Generated: ${today}
+Entries analyzed: ${entries.length}
+────────────────────────────────────
+
+1. WEEKLY OVERVIEW
+[2-3 sentences describing the overall emotional tone and key themes of the week]
+
+2. MOOD DISTRIBUTION
+[Each mood that appeared, how many days, and brief context about when it occurred]
+
+3. EMOTIONAL PATTERNS OBSERVED
+[2-3 specific patterns or transitions noted — e.g. mood shifts, recurring themes, triggers]
+
+4. POSITIVE HIGHLIGHTS
+[Notable positive moments, resilience, or strengths demonstrated this week]
+
+5. AREAS REQUIRING ATTENTION
+[Concerning patterns, persistent low moods, or stress indicators. If none: "No significant concerns identified this week."]
+
+6. SUGGESTED DISCUSSION POINTS FOR HEALTHCARE PROVIDER
+[3-5 specific, professionally framed talking points a therapist or doctor might explore]
+
+────────────────────────────────────
+DISCLAIMER: This report is generated by AI from personal diary entries and does not constitute a medical or psychiatric assessment. It is intended as supplemental context for healthcare conversations only. Always consult a qualified professional for mental health concerns.`;
+
+  const result = await model.generateContent(prompt);
+  return result.response.text().trim();
+}
+
+function getMockWeeklyReport(entries, weekLabel) {
+  if (entries.length === 0) {
+    return `WEEKLY MOOD ANALYSIS REPORT\nPeriod: ${weekLabel}\n\nNo diary entries found for this week. Start writing to generate your mood report.`;
+  }
+  return `WEEKLY MOOD ANALYSIS REPORT\nPeriod: ${weekLabel}\n\nAdd GEMINI_API_KEY to server/.env to generate a full AI-powered weekly report.`;
+}
+
+module.exports = { analyzeEntry, transcribeAudio, chatWithContext, analyzeDecision, reflectOnDecision, generateWeeklyReport, MOOD_COLORS, MOOD_SHAPES };

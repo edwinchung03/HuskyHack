@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { analyzeEntry, transcribeAudio, chatWithContext } = require('../services/gemini');
+const { analyzeEntry, transcribeAudio, chatWithContext, generateWeeklyReport } = require('../services/gemini');
 const { storeMemory, searchMemories, getAllMemories } = require('../services/backboard');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
@@ -51,6 +51,19 @@ router.post('/companion', async (req, res) => {
     res.json(response);
   } catch (err) {
     console.error('Companion error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Weekly mood report for a set of diary entries
+router.post('/weekly-report', async (req, res) => {
+  try {
+    const { entries, weekLabel } = req.body;
+    if (!Array.isArray(entries)) return res.status(400).json({ error: 'entries array required' });
+    const report = await generateWeeklyReport(entries, weekLabel || 'This week');
+    res.json({ report });
+  } catch (err) {
+    console.error('Weekly report error:', err);
     res.status(500).json({ error: err.message });
   }
 });
