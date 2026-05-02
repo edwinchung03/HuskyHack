@@ -47,6 +47,10 @@ export async function uploadImage(blob) {
   return req('POST', '/upload/image', fd);
 }
 
+// Weekly mood report
+export const getWeeklyReport = (entries, weekLabel) =>
+  req('POST', '/ai/weekly-report', { entries, weekLabel });
+
 // Decisions
 export const getDecisions      = ()          => req('GET',    '/decisions');
 export const getDecision       = (id)        => req('GET',    `/decisions/${id}`);
