@@ -1,4 +1,24 @@
-const BASE = '/api';
+const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE = RAW_API_BASE.replace(/\/$/, '');
+const ASSET_ORIGIN = BASE.endsWith('/api') ? BASE.slice(0, -4) : BASE;
+
+function absolutizeUrl(value) {
+  if (!value || typeof value !== 'string') return value;
+  if (/^https?:\/\//i.test(value) || value.startsWith('blob:') || value.startsWith('data:')) return value;
+  if (value.startsWith('/')) return `${ASSET_ORIGIN}${value}`;
+  return value;
+}
+
+function normalizeApiData(data) {
+  if (Array.isArray(data)) return data.map(normalizeApiData);
+  if (!data || typeof data !== 'object') return data;
+
+  const normalized = { ...data };
+  if ('path' in normalized) normalized.path = absolutizeUrl(normalized.path);
+  if ('image_path' in normalized) normalized.image_path = absolutizeUrl(normalized.image_path);
+  if ('audio_path' in normalized) normalized.audio_path = absolutizeUrl(normalized.audio_path);
+  return normalized;
+}
 
 async function req(method, path, body) {
   const opts = { method, headers: {} };
@@ -16,7 +36,8 @@ async function req(method, path, body) {
     Object.assign(error, err);
     throw error;
   }
-  return res.json();
+  const data = await res.json();
+  return normalizeApiData(data);
 }
 
 export const getEntries   = ()           => req('GET',    '/entries');
