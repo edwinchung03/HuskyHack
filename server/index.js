@@ -12,15 +12,23 @@ const uploadRouter    = require('./routes/upload');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const allowedOrigins = [
+const configuredOrigins = [
+  process.env.CORS_ORIGIN,
+  process.env.FRONTEND_ORIGIN,
+].flatMap(value => value ? value.split(',').map(origin => origin.trim()).filter(Boolean) : []);
+
+const allowedOrigins = Array.from(new Set([
   'http://localhost:5173',
   'http://localhost:3000',
   'https://husky-hack-3923.vercel.app',
-  ...(process.env.FRONTEND_ORIGIN ? process.env.FRONTEND_ORIGIN.split(',').map(origin => origin.trim()).filter(Boolean) : []),
-];
+  ...configuredOrigins,
+]));
 
 app.use(cors({
-  origin: allowedOrigins
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked origin: ${origin}`));
+  }
 }));
 
 app.use(express.json({ limit: '50mb' }));

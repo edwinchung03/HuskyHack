@@ -1,5 +1,12 @@
-const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
-const BASE = RAW_API_BASE.replace(/\/$/, '');
+const DEFAULT_API_BASE = import.meta.env.DEV ? '/api' : 'https://huskyhack-memories.onrender.com/api';
+const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE;
+
+function normalizeApiBase(value) {
+  const base = String(value || '').replace(/\/+$/, '');
+  return base.endsWith('/api') ? base : `${base}/api`;
+}
+
+const BASE = normalizeApiBase(RAW_API_BASE);
 const ASSET_ORIGIN = BASE.endsWith('/api') ? BASE.slice(0, -4) : BASE;
 
 function absolutizeUrl(value) {
@@ -8,6 +15,8 @@ function absolutizeUrl(value) {
   if (value.startsWith('/')) return `${ASSET_ORIGIN}${value}`;
   return value;
 }
+
+export const assetUrl = absolutizeUrl;
 
 function normalizeApiData(data) {
   if (Array.isArray(data)) return data.map(normalizeApiData);

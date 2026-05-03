@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import { assetUrl } from '../api';
 import MoodShape, { MOOD_CONFIG, normalizeMood } from './MoodShape';
 import styles from './DiaryPreview.module.css';
 
@@ -25,7 +26,7 @@ export default function DiaryPreview({ entry, onClose, onEdit }) {
         {/* Image */}
         {entry.image_path && (
           <div className={styles.imageWrap}>
-            <img src={entry.image_path} alt="Entry" className={styles.image} />
+            <img src={assetUrl(entry.image_path)} alt="Entry" className={styles.image} />
           </div>
         )}
 

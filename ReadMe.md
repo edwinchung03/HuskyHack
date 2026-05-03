@@ -29,3 +29,34 @@ By combining journaling with mood tracking, we aimed to create a tool that promo
 ## **How we built the project** 
 Languages, frameworks, libraries: JavaScript, react, vite, nodejs, express 
 AI tools used: ClaudeAI
+
+## Deployment
+
+This repository has a Vite frontend in `client` and an Express API in `server`.
+The deployed frontend needs a deployed backend URL; the local Vite proxy only works during `npm run dev`.
+
+### Frontend on Vercel
+
+Set this environment variable in Vercel:
+
+```bash
+VITE_API_BASE_URL=https://your-backend-url.example.com
+```
+
+Then redeploy the Vercel project. The included `vercel.json` builds `client` and serves the Vite output.
+
+### Backend
+
+Deploy the `server` folder to a Node host such as Render, Railway, Fly.io, or another service that supports a persistent disk if you want to keep using SQLite.
+
+Required/recommended backend environment variables:
+
+```bash
+PORT=3001
+CORS_ORIGIN=https://husky-hack-3923.vercel.app
+SQLITE_PATH=/path/to/persistent/diary.sqlite
+GEMINI_API_KEY=your_gemini_key
+BACKBOARD_API_KEY=your_backboard_key
+```
+
+For Render with a persistent disk, `SQLITE_PATH` can be something like `/var/data/diary.sqlite`.

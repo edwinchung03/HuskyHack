@@ -1,13 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
-import { uploadImage } from '../api';
+import { assetUrl, uploadImage } from '../api';
 import styles from './ImagePanel.module.css';
 export default function ImagePanel({ onImageSaved, savedImagePath }) {
   const fileRef = useRef(null);
-  const [preview, setPreview] = useState(savedImagePath || null);
+  const [preview, setPreview] = useState(assetUrl(savedImagePath) || null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    if (savedImagePath) setPreview(savedImagePath);
+    if (savedImagePath) setPreview(assetUrl(savedImagePath));
   }, [savedImagePath]);
 
   async function handleUpload(e) {
@@ -19,7 +19,7 @@ export default function ImagePanel({ onImageSaved, savedImagePath }) {
     try {
       const res = await uploadImage(file);
       if (res.path) {
-        setPreview(res.path);
+        setPreview(assetUrl(res.path));
         onImageSaved(res.path);
       }
     } finally {
