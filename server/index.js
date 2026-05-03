@@ -20,8 +20,7 @@ const configuredOrigins = [
 const allowedOrigins = Array.from(new Set([
   'http://localhost:5173',
   'http://localhost:3000',
-  'https://husky-hack-3923.vercel.app',
-  'https://husky-hack.vercel.app'
+  'https://husky-hack-3923.vercel.app'
   ...configuredOrigins,
 ]));
 
