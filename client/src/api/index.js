@@ -1,5 +1,4 @@
-const DEFAULT_API_BASE = import.meta.env.DEV ? '/api' : 'https://huskyhack-memories.onrender.com/api';
-const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE;
+const RAW_API_BASE = https://huskyhack-memories.onrender.com/api';
 
 function normalizeApiBase(value) {
   const base = String(value || '').replace(/\/+$/, '');
