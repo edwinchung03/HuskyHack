@@ -1,4 +1,4 @@
-const RAW_API_BASE = https://huskyhack-memories.onrender.com/api';
+const RAW_API_BASE = 'https://huskyhack-memories.onrender.com/api';
 
 function normalizeApiBase(value) {
   const base = String(value || '').replace(/\/+$/, '');
